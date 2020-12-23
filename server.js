@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
 
 connection.connect(function(err) {
   if (err) throw err;
-  runSearch();
+  action();
 });
 
 // Prompt the first question and call functions based on response
@@ -70,17 +70,29 @@ function action() {
 
 // shows everything in the department table
 function viewDeps() {
-    connection.query("SELECT * FROM department")
+    connection.query("SELECT * FROM department", (err, results) => {
+        if (err) throw err
+        console.table(results)
+        action()
+    })
 }
 
 // shows everything in the role table
 function viewRoles() {
-    connection.query("SELECT * FROM role")
+    connection.query("SELECT * FROM role", (err, results) => {
+        if (err) throw err
+        console.table(results)
+        action()
+    })
 }
 
 // shows everything in the employee table
 function viewEmpls() {
-    connection.query("SELECT * FROM employee")
+    connection.query("SELECT * FROM employee", (err, results) => {
+        if (err) throw err
+        console.table(results)
+        action()
+    })
 }
 
 function addDep() {
