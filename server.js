@@ -26,6 +26,7 @@ function action() {
       type: "rawlist",
       message: "What would you like to do?",
       choices: [
+        "View joined tables",  
         "View all departments",
         "View all roles",
         "View all employees",
@@ -37,6 +38,10 @@ function action() {
     })
     .then(function(answer) {
       switch (answer.action) {
+      case "View joined tables":
+        viewJoined();
+        break;
+
       case "View all departments":
         viewDeps();
         break;
@@ -67,6 +72,16 @@ function action() {
       }
     });
 }
+
+// shows everything that overlaps in joined table
+function viewJoined() {
+    connection.query("SELECT role.title, role.salary, employee.first_name, employee.last_name, manager_id, department.name FROM ((employee_tracker_db.role INNER JOIN employee_tracker_db.employee ON role.id = employee.role_id) INNER JOIN employee_tracker_db.department ON role.department_id = department.id)", (err, results) => {
+        if (err) throw err
+        console.table(results)
+        action()
+    })
+}
+
 
 // shows everything in the department table
 function viewDeps() {
