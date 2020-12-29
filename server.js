@@ -212,5 +212,56 @@ function addEmpl() {
   });
 }
 
-function updateEmpl() {}
-
+function updateEmpl() {
+  // query the database for all employees
+  connection.query("SELECT * FROM employee", function(err, results) {
+    if (err) throw err;
+    // once you have the employees, prompt the user for which they'd like to update
+    inquirer
+      .prompt([
+        {
+          name: "choice",
+          type: "rawlist",
+          choices: function() {
+            var choiceArray = [];
+            for (var i = 0; i < results.length; i++) {
+              choiceArray.push(`${results[i].first_name} ${results[i].last_name}`);
+            }
+            return choiceArray;
+          },
+          message: "Which employee's role would you like to update?"
+        },
+        {
+          name: "newRole",
+          type: "input",
+          message: "What is the employee's new role id?"
+        }
+      ])
+      .then(function(answer) {
+            // get the information of the chosen item
+            var chosenEmployee;
+            for (var i = 0; i < results.length; i++) {
+            if (`${results[i].first_name} ${results[i].last_name}` === answer.choice) {
+                chosenEmployee = results[i];
+            }
+            }
+            connection.query(
+                "UPDATE employee SET ? WHERE ?",
+                [
+                {
+                    role_id: answer.newRole
+                },
+                {
+                    id: chosenEmployee.id
+                }
+                ],
+                function(error) {
+                if (error) throw err;
+                console.log("Employee updated successfully!");
+                viewEmpls()
+                action();
+                }
+            );
+        });
+    });  
+}
