@@ -33,7 +33,8 @@ function action() {
         "Add a department",
         "Add a role",
         "Add an employee",
-        "Update an employee's role"
+        "Update an employee's role",
+        "Finished. End connection"
       ]
     })
     .then(function(answer) {
@@ -68,6 +69,10 @@ function action() {
 
       case  "Update an employee's role":
         updateEmpl();
+        break;
+
+      case  "Finished. End connection":
+        endConn();
         break;
       }
     });
@@ -253,7 +258,7 @@ function updateEmpl() {
         }
       ])
       .then(function(answer) {
-            // get the information of the chosen item
+            // get the information of the chosen employee
             var chosenEmployee;
             for (var i = 0; i < results.length; i++) {
             if (`${results[i].first_name} ${results[i].last_name}` === answer.choice) {
@@ -279,4 +284,10 @@ function updateEmpl() {
             );
         });
     });  
+}
+
+function endConn(err) {
+    if (err) throw err
+    console.log("Connection ended.")
+    connection.end()
 }
