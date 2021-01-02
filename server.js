@@ -34,6 +34,9 @@ function action() {
         "Add a role",
         "Add an employee",
         "Update an employee's role",
+        "Delete a department",
+        "Delete a role",
+        "Delete an employee",
         "Finished. End connection"
       ]
     })
@@ -69,6 +72,18 @@ function action() {
 
       case  "Update an employee's role":
         updateEmpl();
+        break;
+
+      case  "Delete a department":
+        deleteDep();
+        break;
+        
+      case  "Delete a role":
+        deleteRole();
+        break;
+
+      case  "Delete an employee":
+        deleteEmp();
         break;
 
       case  "Finished. End connection":
@@ -136,7 +151,7 @@ function addDep() {
         if (err) throw err;
         console.log("Department added successfully");
         // reprint all departments with new one added
-        viewDeps()
+        // viewDeps()
         // re-prompt the user for the next action
         action();
       }
@@ -177,7 +192,7 @@ function addRole() {
         if (err) throw err;
         console.log("Role added successfully");
         // reprint all roles with new one added
-        viewRoles()
+        // viewRoles()
         // re-prompt the user for the next action
         action();
       }
@@ -224,7 +239,7 @@ function addEmpl() {
         if (err) throw err;
         console.log("Employee added successfully");
         // reprint all employees with new one added
-        viewEmpls()
+        // viewEmpls()
         // re-prompt the user for the next action
         action();
       }
@@ -275,15 +290,150 @@ function updateEmpl() {
                     id: chosenEmployee.id
                 }
                 ],
-                function(error) {
-                if (error) throw err;
+                function(err) {
+                if (err) throw err;
                 console.log("Employee updated successfully!");
-                viewEmpls()
+                // viewEmpls()
                 action();
                 }
             );
         });
     });  
+}
+
+function deleteDep() {
+    connection.query("SELECT * FROM department", function(err, results) {
+        if (err) throw err;
+        // once you have the departments, prompt the user for which they'd like to delete
+        inquirer
+          .prompt([
+            {
+              name: "choice",
+              type: "rawlist",
+              choices: function() {
+                var choiceArray = [];
+                for (var i = 0; i < results.length; i++) {
+                  choiceArray.push(results[i].name);
+                }
+                return choiceArray;
+              },
+              message: "Which department would you like to remove?"
+            }
+          ])
+          .then(function(answer) {
+                // get the information of the chosen department
+                var chosenDep;
+                for (var i = 0; i < results.length; i++) {
+                if (results[i].name === answer.choice) {
+                    chosenDep = results[i];
+                }
+                }
+                connection.query(
+                    "DELETE FROM department WHERE ?",
+                    [
+                    {
+                        id: chosenDep.id
+                    }
+                    ],
+                    function(err) {
+                    if (err) throw err;
+                    console.log("Department removed successfully!");
+                    // viewDeps()
+                    action();
+                    }
+                );
+            });
+        });  
+}
+
+function deleteRole() {
+    connection.query("SELECT * FROM role", function(err, results) {
+        if (err) throw err;
+        // once you have the roles, prompt the user for which they'd like to delete
+        inquirer
+          .prompt([
+            {
+              name: "choice",
+              type: "rawlist",
+              choices: function() {
+                var choiceArray = [];
+                for (var i = 0; i < results.length; i++) {
+                  choiceArray.push(results[i].title);
+                }
+                return choiceArray;
+              },
+              message: "Which role would you like to remove?"
+            }
+          ])
+          .then(function(answer) {
+                // get the information of the chosen role
+                var chosenRole;
+                for (var i = 0; i < results.length; i++) {
+                if (results[i].title === answer.choice) {
+                    chosenRole = results[i];
+                }
+                }
+                connection.query(
+                    "DELETE FROM role WHERE ?",
+                    [
+                    {
+                        id: chosenRole.id
+                    }
+                    ],
+                    function(err) {
+                    if (err) throw err;
+                    console.log("Role removed successfully!");
+                    // viewRoles()
+                    action();
+                    }
+                );
+            });
+        });  
+}
+
+function deleteEmp() {
+    connection.query("SELECT * FROM employee", function(err, results) {
+        if (err) throw err;
+        // once you have the employees, prompt the user for which they'd like to delete
+        inquirer
+          .prompt([
+            {
+              name: "choice",
+              type: "rawlist",
+              choices: function() {
+                var choiceArray = [];
+                for (var i = 0; i < results.length; i++) {
+                  choiceArray.push(`${results[i].first_name} ${results[i].last_name}`);
+                }
+                return choiceArray;
+              },
+              message: "Which employee would you like to remove?"
+            }
+          ])
+          .then(function(answer) {
+                // get the information of the chosen employee
+                var chosenEmployee;
+                for (var i = 0; i < results.length; i++) {
+                if (`${results[i].first_name} ${results[i].last_name}` === answer.choice) {
+                    chosenEmployee = results[i];
+                }
+                }
+                connection.query(
+                    "DELETE FROM employee WHERE ?",
+                    [
+                    {
+                        id: chosenEmployee.id
+                    }
+                    ],
+                    function(err) {
+                    if (err) throw err;
+                    console.log("Employee removed successfully!");
+                    // viewEmpls()
+                    action();
+                    }
+                );
+            });
+        });  
 }
 
 function endConn(err) {
